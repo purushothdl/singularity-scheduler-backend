@@ -1,0 +1,1 @@
+# App settings, Google Calendar config, MongoDB URIs

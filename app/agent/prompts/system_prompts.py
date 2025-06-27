@@ -1,0 +1,1 @@
+# Base system prompts for different contexts

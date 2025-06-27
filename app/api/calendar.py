@@ -1,0 +1,1 @@
+# Direct calendar operations (list events, availability)

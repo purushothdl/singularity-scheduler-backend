@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.so
+.Python
+venv/
+
+# Environment files
+.env
+service_account.json
+
+# IDE/Editor
+.vscode/
+.idea/
+
+# Logs and databases
+*.log
+*.sqlite
+*.db
+
+# Build and distribution
+dist/
+build/
