@@ -1,56 +1,19 @@
 import logging
-from logging.config import dictConfig
+import sys
+from logging.handlers import RotatingFileHandler
 
-# This configuration uses a custom JSON formatter to make logs
-# easily parsable by log management systems.
-LOGGING_CONFIG = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "json": {
-            "()": "pythonjsonlogger.jsonlogger.JsonFormatter",
-            "format": "%(asctime)s %(name)s %(levelname)s %(message)s %(pathname)s %(lineno)d",
-        },
-        "default": {
-            "format": "[%(asctime)s] [%(levelname)s] [%(name)s] %(message)s",
-            "datefmt": "%Y-%m-%d %H:%M:%S",
-        },
-    },
-    "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-            "formatter": "default",
-            "level": "INFO",
-            "stream": "ext://sys.stdout",
-        },
-        "json_console": {
-            "class": "logging.StreamHandler",
-            "formatter": "json",
-            "level": "INFO",
-            "stream": "ext://sys.stdout",
-        },
-    },
-    "loggers": {
-        "uvicorn": {
-            "handlers": ["console"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "fastapi": {
-            "handlers": ["console"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "app": {
-            "handlers": ["console"], 
-            "level": "INFO",
-            "propagate": False,
-        },
-    },
-}
+logger = logging.getLogger("app_logger")
+logger.setLevel(logging.DEBUG)
 
-def setup_logging():
-    """Applies the logging configuration."""
-    dictConfig(LOGGING_CONFIG)
+file_handler = RotatingFileHandler("logs/app_logs.log", maxBytes=10**6, backupCount=3)
+file_handler.setLevel(logging.DEBUG)
 
-# Add 'python-json-logger' to your requirements.txt
+console_handler = logging.StreamHandler(sys.stdout)
+console_handler.setLevel(logging.DEBUG)
+
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+file_handler.setFormatter(formatter)
+console_handler.setFormatter(formatter)
+
+logger.addHandler(file_handler)
+logger.addHandler(console_handler)

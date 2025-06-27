@@ -1,1 +1,0 @@
-# Chat request/response models

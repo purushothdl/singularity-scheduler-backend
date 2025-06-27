@@ -1,1 +1,0 @@
-# Base Pydantic model with common fields
