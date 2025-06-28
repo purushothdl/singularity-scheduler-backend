@@ -4,6 +4,8 @@ from app.schemas.user import UserUpdate, UserInDB
 from app.core.exceptions import UserNotFoundException
 
 class UserService:
+    """Service to handle user-related operations."""
+
     def __init__(self, db: AsyncIOMotorDatabase):
         self.db = db
         self.collection = self.db.get_collection("users")
@@ -11,6 +13,16 @@ class UserService:
     async def update_user_profile(self, user_id: str, user_update: UserUpdate) -> UserInDB:
         """
         Updates a user's profile information in the database.
+
+        Args:
+            user_id (str): The ID of the user to update.
+            user_update (UserUpdate): The data to update the user with.
+
+        Returns:
+            UserInDB: The updated user.
+
+        Raises:
+            UserNotFoundException: If the user with the given ID is not found.
         """
         update_data = user_update.model_dump(exclude_unset=True)
 

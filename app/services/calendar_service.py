@@ -1,1 +1,0 @@
-# Google Calendar API wrapper, CRUD operations

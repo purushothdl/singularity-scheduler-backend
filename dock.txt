@@ -1,0 +1,71 @@
+app/
+├── api/
+│   ├── auth.py                    # Authentication endpoints (login, register, logout)
+│   ├── chat.py                    # Main chat endpoint - send messages to agent
+│   └── user.py                    # User profile management (timezone settings)
+│
+├── core/
+│   ├── config.py                  # App settings, Google Calendar config, MongoDB URIs
+│   ├── error_handler.py           # Global exception handlers for FastAPI
+│   ├── exceptions.py              # Custom exceptions (CalendarError, AgentError, etc.)
+│   ├── log_config.py              # Logging configuration
+│   └── security.py                # JWT handling, password hashing
+│
+├── database/
+│   ├── mongodb.py                 # MongoDB connection, database instance
+│
+├── dependencies/
+│   ├── auth_dependencies.py       # Current user dependency, auth guards
+│   ├── service_dependencies.py    # All service dependency injections
+│
+├── main.py                        # FastAPI app initialization, middleware, routers
+│
+│
+├── schemas/
+│   ├── auth.py                    # Authentication request/response schemas
+│   ├── base.py                    # Base schemas and shared types
+│   ├── chat.py                    # Chat API request/response schemas
+│   ├── event.py                   
+│   └── user.py                    # User API schemas
+│
+├── services/
+│   ├── auth_service.py            # User authentication, JWT creation/validation
+│   ├── calendar_service.py        # Google Calendar API wrapper, CRUD operations
+│   └── user_service.py            # User profile management, timezone handling
+│
+├── agent/
+│   ├── init.py
+│   ├── graph.py                   # LangGraph workflow definition and state management
+│   ├── tools/
+│   │   ├── init.py
+│   │   ├── calendar_tools.py      # Calendar CRUD tools for the agent
+│   │   ├── search_tools.py        # Web search tools (if needed)
+│   ├── prompts/
+│   │   ├── system_prompts.py      # Base system prompts for different contexts
+│   │   └── prompt_templates.py    # Dynamic prompt generation utilities
+│   └── utils/
+│       ├── time_parser.py         # Natural language time parsing utilities
+│       ├── conflict_detector.py   # Meeting overlap detection logic
+│       └── suggestion_engine.py   # Smart time suggestion algorithms
+│
+└── middleware/
+├── timing_middleware.py       # Request timing middleware
+└── utils/
+    └── message_utils.py       # Message parsing utilities
+├── tests/
+│   ├── unit/
+│   │   ├── domain/
+│   │   ├── core/
+│   │   ├── utils/
+│   ├── integration/
+│   │   ├── database/
+│   │   ├── api/
+│   ├── conftest.py              # Pytest fixtures
+│   └── pytest.ini               # Test configuration
+├── Makefile                     # Automation scripts
+├── requirements.txt
+├── Dockerfile
+├── docker-compose.yml
+├── .env
+├── .gitignore
+└── README.md

@@ -1,7 +1,13 @@
 import json
 from typing import AsyncGenerator, Dict, Any, List, Set
 
-from langchain_core.messages import HumanMessage, AIMessage, ToolMessage, BaseMessage, SystemMessage
+from langchain_core.messages import (
+    BaseMessage,
+    SystemMessage,
+    HumanMessage,
+    AIMessage,
+    ToolMessage
+)
 
 from app.agent.graph import agent_app, AgentState
 from app.agent.prompts.system_prompts import get_system_prompt
@@ -51,6 +57,13 @@ class ChatService:
     def _format_stream_event(self, event: Dict[str, Any], seen_tool_calls: Set[str]) -> str | None:
         """
         Formats a single event chunk from the agent into an SSE-compatible string.
+
+        Args:
+            event (Dict[str, Any]): The event chunk from the agent.
+            seen_tool_calls (Set[str]): A set of tool call IDs that have already been processed.
+
+        Returns:
+            str | None: The formatted SSE string, or None if the event should be ignored.
         """
         for key, value in event.items():
             if key == "agent":
@@ -60,6 +73,16 @@ class ChatService:
         return None
 
     def _format_ai_message(self, value: Dict[str, Any], seen_tool_calls: Set[str]) -> str | None:
+        """
+        Formats an AI message event into an SSE-compatible string.
+
+        Args:
+            value (Dict[str, Any]): The AI message event.
+            seen_tool_calls (Set[str]): A set of tool call IDs that have already been processed.
+
+        Returns:
+            str | None: The formatted SSE string, or None if the event should be ignored.
+        """
         ai_message = value.get("messages", [])[-1]
         if isinstance(ai_message, AIMessage):
             if ai_message.content:
@@ -80,6 +103,15 @@ class ChatService:
         return None
 
     def _format_tool_message(self, value: Dict[str, Any]) -> str | None:
+        """
+        Formats a tool message event into an SSE-compatible string.
+
+        Args:
+            value (Dict[str, Any]): The tool message event.
+
+        Returns:
+            str | None: The formatted SSE string, or None if the event should be ignored.
+        """
         tool_message = value.get("messages", [])[-1]
         if isinstance(tool_message, ToolMessage):
             chunk = {

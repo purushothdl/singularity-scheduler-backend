@@ -1,1 +1,0 @@
-# Business hours, meeting type validation

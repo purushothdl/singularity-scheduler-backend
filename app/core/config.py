@@ -18,6 +18,7 @@ class Settings(BaseSettings):
 
     COMPANY_TIMEZONE: str = "Asia/Kolkata"
     COMPANY_WORKING_HOURS: str = "10:00 AM to 6:00 PM"
+    MEETING_BUFFER_MINUTES: int = 15
 
     class Config:
         env_file = ".env"
