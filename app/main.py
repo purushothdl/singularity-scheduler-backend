@@ -34,13 +34,13 @@ app = FastAPI(
     title="AI Booking Agent API",
     description="API for an AI-powered event booking agent.",
     version="1.0.0",
-    lifespan=lifespan
+    lifespan=lifespan 
 )
 
 app.add_middleware(TimingMiddleware)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  
+    allow_origins=settings.ALLOWED_FRONTEND_URLS,  
     allow_credentials=True,
     allow_methods=["*"],  
     allow_headers=["*"], 

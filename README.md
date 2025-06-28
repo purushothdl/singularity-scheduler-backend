@@ -12,7 +12,7 @@ This project is a sophisticated, conversational AI agent designed to assist user
 
 Interact with the live agent here:
 
-[https://helion-front-end-mayw7rjzktuqltobas2a2h.streamlit.app/]
+https://helion-front-end-mayw7rjzktuqltobas2a2h.streamlit.app/
 
 **Note:** The backend is hosted on a free-tier service, so the first request may take up to 30 seconds to wake the server.
 
@@ -83,8 +83,8 @@ You can run the entire application stack locally using Docker and Docker Compose
 1. **Clone the repository:**
 
    ```bash
-   git clone [https://github.com/purushothdl/booking-agent-proto]
-   cd [booking-agent-proto]
+   git clone https://github.com/purushothdl/booking-agent-proto
+   cd booking-agent-proto
    ```
 
 2. **Create the environment file:**
