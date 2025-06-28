@@ -1,6 +1,11 @@
 import logging
+import os
 import sys
 from logging.handlers import RotatingFileHandler
+
+log_dir = "logs"
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
 
 logger = logging.getLogger("app_logger")
 logger.setLevel(logging.DEBUG)
