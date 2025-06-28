@@ -6,8 +6,7 @@ from typing import List, Dict
 
 from bson import ObjectId
 from fastapi.concurrency import run_in_threadpool
-from google.oauth2 import service_account
-from googleapiclient.discovery import build, Resource
+
 from googleapiclient.errors import HttpError
 from langchain_core.tools import tool
 from motor.motor_asyncio import AsyncIOMotorDatabase
@@ -15,17 +14,7 @@ from pymongo.errors import DuplicateKeyError
 
 from app.core.config import settings
 from app.database.mongodb import get_db
-
-def _get_calendar_service() -> Resource:
-    """(Internal) Initializes the Google Calendar service client."""
-    try:
-        creds_info = json.loads(base64.b64decode(settings.GOOGLE_CREDENTIALS_BASE64))
-        creds = service_account.Credentials.from_service_account_info(
-            creds_info, scopes=settings.GOOGLE_CALENDAR_SCOPES
-        )
-        return build('calendar', 'v3', credentials=creds)
-    except Exception as e:
-        raise ConnectionError(f"Failed to build Google Calendar service: {e}")
+from app.services.calendar_service import calendar_service_instance
 
 async def _internal_create_event(
     summary: str, start_time: str, end_time: str, current_user: Dict
@@ -43,7 +32,7 @@ async def _internal_create_event(
 
     start_utc = start_dt.astimezone(pytz.UTC)
     end_utc = end_dt.astimezone(pytz.UTC)
-    
+    # 1. LOCAL BOOKING: Insert the event into our database first to reserve the slot.
     event_to_db = {
         "google_event_id": None, 
         "owner_user_id": ObjectId(current_user['id']), 
@@ -63,7 +52,8 @@ async def _internal_create_event(
         return "Error: Apologies, but that exact time slot was booked while we were finalizing. Please try another time."
 
     try:
-        service = _get_calendar_service()
+        # 2. EXTERNAL SYNC: After successfully booking locally, sync with Google Calendar.
+        service = await run_in_threadpool(calendar_service_instance.get_client)
         event_body = {
             'summary': summary, 
             'description': f"Call booked by {current_user.get('email')}",
@@ -73,7 +63,7 @@ async def _internal_create_event(
         created_event = service.events().insert(
             calendarId=settings.CALENDAR_ID, body=event_body
         ).execute()
-        
+        # 3. FINALIZE: Update our local record with the Google Event ID.
         await events_collection.update_one(
             {"_id": temp_event_id_for_db},
             {"$set": {
@@ -83,6 +73,8 @@ async def _internal_create_event(
         )
         return f"Event created successfully! Link: {created_event.get('htmlLink')}"
     except Exception as e:
+        # COMPENSATING ACTION: If any step after the initial insert fails,
+        # ensure the reserved slot is deleted from our database to prevent orphaned records.
         await events_collection.delete_one({"_id": temp_event_id_for_db})
         return f"Error: Could not create event on Google Calendar after reserving the slot. Reason: {e}"
 
@@ -107,6 +99,7 @@ async def confirm_and_book_event(summary: str, start_time: str, end_time: str, c
         start_utc, end_utc = start_dt.astimezone(pytz.UTC), end_dt.astimezone(pytz.UTC)
         buffer = timedelta(minutes=settings.MEETING_BUFFER_MINUTES)
         
+        # CONFLICT CHECK: Ensure the proposed slot (including buffer) doesn't overlap with existing events.
         conflicting_event = await events_collection.find_one({
             "start_time_utc": {"$lt": end_utc + buffer},
             "end_time_utc": {"$gt": start_utc - buffer}
@@ -153,7 +146,7 @@ async def list_events(current_user: Dict, start_time: str = None, end_time: str 
     if time_filter: 
         query["start_time_utc"] = time_filter
     else: 
-        query["start_time_utc"] = {"$gte": datetime.utcnow()}
+        query["start_time_utc"] = {"$gte": datetime.utcnow().replace(tzinfo=pytz.UTC)}
     
     serializable_events = []
     cursor = events_collection.find(query).sort("start_time_utc", 1)
@@ -192,7 +185,7 @@ async def delete_event(event_id: str, current_user: Dict) -> str:
         return "Error: Permission Denied. You are not the owner of this event."
 
     try:
-        service = await run_in_threadpool(_get_calendar_service)
+        service = await run_in_threadpool(calendar_service_instance.get_client)
         await run_in_threadpool(
             service.events().delete(
                 calendarId=settings.CALENDAR_ID, eventId=event_id
@@ -201,6 +194,11 @@ async def delete_event(event_id: str, current_user: Dict) -> str:
         await events_collection.delete_one({"google_event_id": event_id})
         return f"Event '{event_doc['title']}' deleted successfully."
     except HttpError as e:
+        # The event might already be deleted on Google's side, which is fine.
+        # Check if the error is a 404 or 410, and if so, proceed to delete locally.
+        if e.resp.status in [404, 410]:
+             await events_collection.delete_one({"google_event_id": event_id})
+             return f"Event '{event_doc['title']}' was already deleted from the calendar, and has now been removed from our records."
         return f"An error occurred with Google Calendar API: {e}"
     except Exception as e:
         return f"An unexpected error occurred: {e}"
@@ -248,9 +246,9 @@ async def update_user_timezone(current_user: Dict, timezone: str) -> str:
 @tool
 async def update_event(event_id: str, current_user: Dict, new_start_time: str = None, new_summary: str = None) -> str:
     """
-    Updates an existing event's time or title using its google_event_id. 
-    The user must be the owner. To reschedule, provide the `new_start_time`. 
-    The original duration will be preserved. This tool performs a final check to ensure the new time slot is available before committing.
+    Updates an existing event's time or title using its google_event_id. The user must be the owner.
+    To reschedule, this tool performs a final availability check (including buffer time) to ensure the new slot is free.
+    The original event duration is preserved when rescheduling.
     """
     db: AsyncIOMotorDatabase = get_db()
     events_collection = db.get_collection("events")
@@ -269,26 +267,44 @@ async def update_event(event_id: str, current_user: Dict, new_start_time: str = 
     db_update_payload = {}
     new_start_dt, new_end_dt = None, None
 
-    if new_summary: db_update_payload['title'] = new_summary
+    if new_summary:
+        db_update_payload['title'] = new_summary
+
     if new_start_time:
         user_tz = pytz.timezone(current_user.get('timezone', 'UTC'))
         duration = original_end_utc - original_start_utc
+        
         new_start_dt = datetime.fromisoformat(new_start_time.replace('Z', ''))
-        if new_start_dt.tzinfo is None: new_start_dt = user_tz.localize(new_start_dt)
+        if new_start_dt.tzinfo is None:
+            new_start_dt = user_tz.localize(new_start_dt)
         new_end_dt = new_start_dt + duration
         
-        db_update_payload['start_time_utc'] = new_start_dt.astimezone(pytz.UTC)
-        db_update_payload['end_time_utc'] = new_end_dt.astimezone(pytz.UTC)
-    
+        new_start_utc = new_start_dt.astimezone(pytz.UTC)
+        new_end_utc = new_end_dt.astimezone(pytz.UTC)
+        
+        buffer = timedelta(minutes=settings.MEETING_BUFFER_MINUTES)
+        
+        conflicting_event = await events_collection.find_one({
+            "google_event_id": {"$ne": event_id},
+            "start_time_utc": {"$lt": new_end_utc + buffer},
+            "end_time_utc": {"$gt": new_start_utc - buffer}
+        })
+
+        if conflicting_event:
+            return "Error: The requested new time slot is not available as it conflicts with another scheduled meeting. Please try another time."
+        
+        db_update_payload['start_time_utc'] = new_start_utc
+        db_update_payload['end_time_utc'] = new_end_utc
+
     try:
         await events_collection.update_one({"google_event_id": event_id}, {"$set": db_update_payload})
     except DuplicateKeyError:
         return "Error: The requested new time slot is already booked. Please try another time."
     except Exception as e:
-        return f"Error updating database: {e}"
+        return f"Error updating local database: {e}"
 
     try:
-        service = await run_in_threadpool(_get_calendar_service)
+        service = await run_in_threadpool(calendar_service_instance.get_client)
         event_on_google = await run_in_threadpool(service.events().get(calendarId=settings.CALENDAR_ID, eventId=event_id).execute)
         
         if new_summary: event_on_google['summary'] = new_summary
@@ -297,23 +313,21 @@ async def update_event(event_id: str, current_user: Dict, new_start_time: str = 
             event_on_google['end']['dateTime'] = new_end_dt.isoformat()
         
         updated_event = await run_in_threadpool(
-            service.events().update(
-                calendarId=settings.CALENDAR_ID, eventId=event_id, body=event_on_google
-            ).execute
+            service.events().update(calendarId=settings.CALENDAR_ID, eventId=event_id, body=event_on_google).execute
         )
         start = updated_event['start'].get('dateTime', updated_event['start'].get('date'))
         return f"Event '{updated_event['summary']}' updated successfully. It is now scheduled for {start}."
     except Exception as e:
+        # COMPENSATING ACTION: If Google fails, revert the change in our database
         await events_collection.update_one(
             {"google_event_id": event_id},
             {"$set": {
-                    "start_time_utc": original_start_utc,
-                    "end_time_utc": original_end_utc
-                }
-            }
+                "start_time_utc": original_start_utc,
+                "end_time_utc": original_end_utc,
+                "title": event_doc.get("title") 
+            }}
         )
-        
-        return f"Error: Failed to update Google Calendar after reserving slot. Reverted. Reason: {e}"
+        return f"Error: Failed to update Google Calendar after reserving the slot. All changes have been reverted. Reason: {e}"
 
 @tool
 async def find_available_slots(date: str, user_timezone: str, duration_minutes: float = 30.0, current_user: Dict = None) -> List[str]:
@@ -341,7 +355,6 @@ async def find_available_slots(date: str, user_timezone: str, duration_minutes: 
         if user_req_date_aware.date() < now_in_user_tz.date(): 
             return ["The date you selected is in the past."]
         
-        # These are AWARE (UTC)
         search_start_utc = (user_req_date_aware - timedelta(days=1)).astimezone(pytz.UTC)
         search_end_utc = (user_req_date_aware + timedelta(days=2)).astimezone(pytz.UTC)
         
@@ -359,8 +372,8 @@ async def find_available_slots(date: str, user_timezone: str, duration_minutes: 
         available_slots_in_user_tz = []
         for day_offset in range(2):
             day_to_check = (user_req_date_aware + timedelta(days=day_offset)).astimezone(company_tz)
-            slot_runner = day_to_check.replace(hour=10, minute=0, second=0, microsecond=0)
-            day_end = slot_runner.replace(hour=18)
+            slot_runner = day_to_check.replace(hour=settings.COMPANY_WORKING_START_HOUR, minute=0, second=0, microsecond=0)
+            day_end = slot_runner.replace(hour=settings.COMPANY_WORKING_END_HOUR)
             
             while (slot_runner + duration) <= day_end:
                 slot_start_utc = slot_runner.astimezone(pytz.UTC)
@@ -370,7 +383,7 @@ async def find_available_slots(date: str, user_timezone: str, duration_minutes: 
                     slot_in_user_tz = slot_start_utc.astimezone(user_tz)
                     if slot_in_user_tz > now_in_user_tz and slot_in_user_tz.date() == user_req_date_aware.date():
                         available_slots_in_user_tz.append(slot_in_user_tz.isoformat())
-                slot_runner += timedelta(minutes=30)
+                slot_runner += timedelta(minutes=settings.SLOT_CHECK_DURATION_MINUTES)
         return sorted(list(set(available_slots_in_user_tz)))
     except Exception as e:
         return [f"An unexpected error occurred in find_available_slots: {e}"]

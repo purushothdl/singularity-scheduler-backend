@@ -20,6 +20,10 @@ class Settings(BaseSettings):
     COMPANY_WORKING_HOURS: str = "10:00 AM to 6:00 PM"
     MEETING_BUFFER_MINUTES: int = 15
 
+    COMPANY_WORKING_START_HOUR: int = 10
+    COMPANY_WORKING_END_HOUR: int = 18
+    SLOT_CHECK_DURATION_MINUTES: int = 30
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"

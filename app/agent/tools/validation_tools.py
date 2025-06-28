@@ -1,1 +1,0 @@
-# Business logic validation tools
