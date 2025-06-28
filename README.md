@@ -12,7 +12,7 @@ This project is a sophisticated, conversational AI agent designed to assist user
 
 Interact with the live agent here:
 
-https://helion-front-end-mayw7rjzktuqltobas2a2h.streamlit.app/
+https://ea6qdhfoy3yird6eyn8xnn.streamlit.app/
 
 **Note:** The backend is hosted on a free-tier service, so the first request may take up to 30 seconds to wake the server.
 
