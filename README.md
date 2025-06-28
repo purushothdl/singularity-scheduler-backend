@@ -50,19 +50,17 @@ This project was designed with a professional, scalable, and maintainable archit
 
 The codebase is organized into distinct modules, each with a specific responsibility:
 
-Generated code
-app/
-├── api/          # FastAPI routers and API endpoints
-├── agent/        # Core AI agent logic, tools, and prompts (LangGraph)
-├── core/         # App-wide configuration, security, and settings
-├── database/     # Database connection and setup
-├── dependencies/ # FastAPI dependency injection logic
-├── services/     # Business logic layer, decoupling API from data access
-├── schemas/      # Pydantic models for data validation and serialization
-├── main.py       # FastAPI application entry point
-└── ...
+- **`api/`**: Contains FastAPI routers and API endpoint definitions.
+- **`agent/`**: Implements the core AI agent logic, tools, and LangGraph prompts.
+- **`core/`**: Includes global configurations, security settings, and application-wide utilities.
+- **`database/`**: Manages database connection setup and interaction.
+- **`dependencies/`**: Contains FastAPI-specific dependency injection logic.
+- **`services/`**: Encapsulates the business logic, decoupling the API layer from data access.
+- **`schemas/`**: Defines Pydantic models for data validation and serialization.
+- **`main.py`**: The FastAPI application entry point that ties everything together.
 
 This structure ensures that the API layer, business logic, and agent reasoning are all decoupled, making the system easier to test, debug, and extend.
+
 
 ### Key Technical Decisions
 
@@ -85,8 +83,8 @@ You can run the entire application stack locally using Docker and Docker Compose
 1. **Clone the repository:**
 
    ```bash
-   git clone [your-github-repo-url]
-   cd [your-repo-name]
+   git clone [https://github.com/purushothdl/booking-agent-proto]
+   cd [booking-agent-proto]
    ```
 
 2. **Create the environment file:**
