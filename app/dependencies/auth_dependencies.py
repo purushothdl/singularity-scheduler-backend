@@ -2,6 +2,7 @@ from fastapi import Depends, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from motor.motor_asyncio import AsyncIOMotorClient
+from datetime import datetime
 
 from app.core.config import settings
 from app.core.exceptions import InvalidTokenException, UserNotFoundException
@@ -30,7 +31,9 @@ async def get_current_user(
             token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
         )
         email: str = payload.get("sub")
-
+        exp: int = payload.get("exp")
+        if exp and datetime.utcnow() > datetime.utcfromtimestamp(exp):
+            raise InvalidTokenException(detail="Token has expired")
     except JWTError:
         raise InvalidTokenException()
 

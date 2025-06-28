@@ -14,6 +14,7 @@ from app.middleware.timing_middleware import TimingMiddleware
 
 from app.api import auth as auth_router
 from app.api import user as user_router
+from app.api import chat as chat_router
 
 
 @asynccontextmanager
@@ -51,6 +52,7 @@ app.add_exception_handler(BaseAPIException, custom_exception_handler)
 logger.info("Attaching API routers...")
 app.include_router(auth_router.router, prefix="/api")
 app.include_router(user_router.router, prefix="/api")
+app.include_router(chat_router.router, prefix="/api")
 
 @app.get("/", tags=["Health Check"])
 async def read_root():

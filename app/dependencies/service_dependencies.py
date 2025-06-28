@@ -4,6 +4,7 @@ from functools import lru_cache
 
 from app.database.mongodb import get_db
 from app.services.auth_service import AuthService
+from app.services.chat_service import ChatService
 from app.services.user_service import UserService
 
 class ServiceProvider:
@@ -25,3 +26,8 @@ class ServiceProvider:
     @lru_cache(maxsize=None)
     def get_user_service(self) -> UserService:
         return UserService(self.db)
+    
+    @lru_cache(maxsize=None)
+    def get_chat_service(self) -> ChatService: 
+        """Returns a singleton instance of the ChatService."""
+        return ChatService()

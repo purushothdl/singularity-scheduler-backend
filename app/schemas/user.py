@@ -5,12 +5,16 @@ import pytz
 from .base import PyObjectId 
 
 class UserBase(BaseModel):
-    """Base model for user properties."""
+    """
+    Base model for user properties.
+    """
     email: EmailStr
     username: str
 
 class UserCreate(UserBase):
-    """Model for creating a new user."""
+    """
+    Model for creating a new user.
+    """
     password: str = Field(min_length=8)
 
 class UserUpdate(BaseModel):
@@ -31,7 +35,9 @@ class UserUpdate(BaseModel):
         return v
 
 class UserPublic(UserBase):
-    """Model for user information that is safe to return to clients."""
+    """
+    Model for user information that is safe to return to clients.
+    """
     id: PyObjectId = Field(alias="_id", default=None)
     timezone: Optional[str] = None
     
@@ -41,5 +47,7 @@ class UserPublic(UserBase):
         json_encoders = {PyObjectId: str} 
 
 class UserInDB(UserPublic):
-    """Model for user information as stored in the database, including the hashed password."""
+    """
+    Model for user information as stored in the database, including the hashed password.
+    """
     hashed_password: str
