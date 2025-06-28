@@ -1,1 +1,0 @@
-# User Pydantic models (UserCreate, UserResponse, etc.)

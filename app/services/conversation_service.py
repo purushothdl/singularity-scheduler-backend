@@ -1,1 +1,0 @@
-# Chat history management, MongoDB operations
