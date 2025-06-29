@@ -12,7 +12,7 @@ This project is a sophisticated, conversational AI agent designed to assist user
 
 Interact with the live agent here:
 
-https://ea6qdhfoy3yird6eyn8xnn.streamlit.app/
+https://w2usbnhyazjxp7s6a8fzv7.streamlit.app/
 
 **Note:** The backend is hosted on a free-tier service, so the first request may take up to 30 seconds to wake the server.
 
