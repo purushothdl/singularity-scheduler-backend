@@ -2,10 +2,11 @@ import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.core.error_handler import custom_exception_handler
+from app.core.error_handler import custom_exception_handler, validation_exception_handler
 from app.core.exceptions import BaseAPIException
 from app.core.log_config import logger
 
@@ -47,6 +48,7 @@ app.add_middleware(
 )
 
 app.add_exception_handler(BaseAPIException, custom_exception_handler)
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
 
 # --- API Router Setup ---
 logger.info("Attaching API routers...")
