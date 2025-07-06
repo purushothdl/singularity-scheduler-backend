@@ -33,7 +33,7 @@ class UserService:
                 {"_id": ObjectId(user_id)},
                 {"$set": update_data},
                 return_document=True 
-            )
+            ) 
 
         if not user_doc:
             raise UserNotFoundException()

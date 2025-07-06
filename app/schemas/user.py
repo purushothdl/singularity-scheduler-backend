@@ -1,3 +1,4 @@
+import re
 from pydantic import BaseModel, EmailStr, Field, validator
 from typing import Optional
 
@@ -16,6 +17,12 @@ class UserCreate(UserBase):
     Model for creating a new user.
     """
     password: str = Field(min_length=8)
+    @validator('password')
+    def password_must_contain_number(cls, v):
+        # This regex checks if there is at least one digit in the string
+        if not re.search(r"\d", v):
+            raise ValueError('Password must contain at least one number')
+        return v
 
 class UserUpdate(BaseModel):
     """
