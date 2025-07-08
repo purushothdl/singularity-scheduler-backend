@@ -6,7 +6,7 @@
 ![Agent: LangGraph](https://img.shields.io/badge/Agent-LangGraph-orange)
 ![Frontend: React (TypeScript)](https://img.shields.io/badge/Frontend-React%20%28TypeScript%29-red)
 
-An AI-powered conversational scheduling assistant for a fictional small team, “Singularity Labs”, enabling natural-language booking and automatic conflict resolution across timezones.
+An AI-powered conversational scheduling assistant for a fictional small team — **Singularity Labs** — enabling natural-language booking and automatic conflict resolution across timezones.
 
 ## 🚀 Live Demo
 
@@ -100,8 +100,8 @@ You can run the entire application stack locally using Docker and Docker Compose
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/purushothdl/booking-agent-proto
-   cd booking-agent-proto
+   git clone https://github.com/purushothdl/singularity-scheduler-backend
+   cd singularity-scheduler-backend
    ```
 
 2. **Create the environment file:**
