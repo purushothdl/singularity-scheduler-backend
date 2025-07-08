@@ -1,20 +1,46 @@
-# Helion Energy AI Scheduling Concierge
+# Singularity Labs AI Scheduling Concierge
 
 ![Project: AI Booking Agent](https://img.shields.io/badge/Project-AI%20Booking%20Agent-blue)
 ![Python 3.11](https://img.shields.io/badge/Python-3.11-blueviolet)
 ![Framework: FastAPI](https://img.shields.io/badge/Framework-FastAPI-green)
 ![Agent: LangGraph](https://img.shields.io/badge/Agent-LangGraph-orange)
-![Frontend: Streamlit](https://img.shields.io/badge/Frontend-Streamlit-red)
+![Frontend: React (TypeScript)](https://img.shields.io/badge/Frontend-React%20%28TypeScript%29-red)
 
-This project is a sophisticated, conversational AI agent designed to assist users in booking appointments with the team at Helion Energy. It provides a seamless, natural language interface for scheduling, managing, and querying calendar events, powered by a robust and scalable backend architecture.
+An AI-powered conversational scheduling assistant for a fictional small team — **Singularity Labs** — enabling natural-language booking and automatic conflict resolution across timezones.
 
 ## 🚀 Live Demo
 
 Interact with the live agent here:
 
-https://w2usbnhyazjxp7s6a8fzv7.streamlit.app/
+singularitylabs.netlify.app/
 
 **Note:** The backend is hosted on a free-tier service, so the first request may take up to 30 seconds to wake the server.
+
+## 🖼️ Screenshots
+
+These demonstrate how the backend API powers the booking flow:
+
+**🔒 User Registration**
+![Register](demo/register_page.png)
+
+**⏱️ Intelligent Slot Searching**
+![Slot Searching](demo/slot_searching.png)
+
+**✅ Booking Confirmation**
+![Booked](demo/booked.png)
+
+**📅 Synced Google Calendar**
+![Calendar](demo/calendar.png)
+
+You can view the live shared calendar [here](https://calendar.google.com/calendar/embed?src=7743582e37793f0f1622907a74a0cd7a233930a9496faef57e9642c2dbc78857%40group.calendar.google.com&ctz=Asia%2FKolkata).
+
+
+## 🧩 LangGraph: The Agent’s Brain
+
+This agent uses a cyclic graph architecture to decide when to invoke tools vs. when to respond directly. Each tool has access to user context, preventing hallucination and ensuring robust, real-world scheduling logic.
+
+![Agent’s Brain Diagram](demo/agents_brain.png)
+
 
 ## ✨ Core Features
 
@@ -39,7 +65,7 @@ This agent is more than a simple bot; it's a fully-featured scheduling assistant
 | Agent Framework         | LangGraph      | To create a stateful, cyclic, and reliable AI agent with complex logic.     |
 | LLM Orchestration       | LangChain      | For integrating with LLMs and managing agent tools.                         |
 | Database                | MongoDB        | A flexible NoSQL database for storing user and event data.                  |
-| Frontend                | Streamlit      | To create a simple and effective real-time chat interface.                  |
+| Frontend                | React (TypeScript) | To create a modern and interactive real-time chat interface.            |
 | Containerization        | Docker         | For packaging the backend application for consistent deployment.            |
 
 ## 🏗️ Architectural Deep Dive
@@ -61,11 +87,10 @@ The codebase is organized into distinct modules, each with a specific responsibi
 
 This structure ensures that the API layer, business logic, and agent reasoning are all decoupled, making the system easier to test, debug, and extend.
 
-
 ### Key Technical Decisions
 
 - **Concurrency Handling:** A significant focus was placed on building a system that could handle real-world scheduling conflicts. The `confirm_and_book_event` and `update_event` tools use a robust check-then-write pattern with configurable buffer logic to ensure data integrity and prevent double-bookings.
-- **Agent Persona & Prompt Engineering:** The agent's personality is carefully crafted through a detailed system prompt to be professional, futuristic, and helpful, reflecting the Helion Energy brand. The prompt also contains explicit instructions for complex workflows, such as recovering from booking failures and handling users with unknown timezones.
+- **Agent Persona & Prompt Engineering:** The agent's personality is carefully crafted through a detailed system prompt to be professional, futuristic, and helpful, reflecting the Singularity Labs brand. The prompt also contains explicit instructions for complex workflows, such as recovering from booking failures and handling users with unknown timezones.
 - **Decoupled Services:** The architecture utilizes a Dependency Injection pattern via the `ServiceProvider`. This centralizes the instantiation of services (like `AuthService`, `UserService`, `CalendarService`) and makes the system highly testable by allowing for easy mocking of dependencies.
 
 ## ⚙️ Running the Project Locally
@@ -83,8 +108,8 @@ You can run the entire application stack locally using Docker and Docker Compose
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/purushothdl/booking-agent-proto
-   cd booking-agent-proto
+   git clone https://github.com/purushothdl/singularity-scheduler-backend
+   cd singularity-scheduler-backend
    ```
 
 2. **Create the environment file:**
@@ -124,7 +149,6 @@ You can run the entire application stack locally using Docker and Docker Compose
 
    - **Backend API:** http://localhost:8000
    - **API Docs (Swagger UI):** http://localhost:8000/docs
-   - **Streamlit Frontend:** http://localhost:8501
 
 ## 🔮 Future Work & Potential Enhancements
 
