@@ -12,7 +12,7 @@ An AI-powered conversational scheduling assistant for a fictional small team —
 
 Interact with the live agent here:
 
-singularitylabs.netlify.app/
+[singularitylabs.netlify.app](https://singularitylabs.netlify.app) 
 
 **Note:** The backend is hosted on a free-tier service, so the first request may take up to 30 seconds to wake the server.
 
