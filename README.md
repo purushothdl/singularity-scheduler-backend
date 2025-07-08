@@ -1,18 +1,19 @@
-# Helion Energy AI Scheduling Concierge
+# Singularity Labs AI Scheduling Concierge
 
 ![Project: AI Booking Agent](https://img.shields.io/badge/Project-AI%20Booking%20Agent-blue)
 ![Python 3.11](https://img.shields.io/badge/Python-3.11-blueviolet)
 ![Framework: FastAPI](https://img.shields.io/badge/Framework-FastAPI-green)
 ![Agent: LangGraph](https://img.shields.io/badge/Agent-LangGraph-orange)
-![Frontend: Streamlit](https://img.shields.io/badge/Frontend-Streamlit-red)
+![Frontend: React (TypeScript)](https://img.shields.io/badge/Frontend-React%20%28TypeScript%29-red)
 
-This project is a sophisticated, conversational AI agent designed to assist users in booking appointments with the team at Helion Energy. It provides a seamless, natural language interface for scheduling, managing, and querying calendar events, powered by a robust and scalable backend architecture.
+This project is a sophisticated, conversational AI agent designed to assist users in booking appointments with the team at Singularity Labs. It provides a seamless, natural language interface for scheduling, managing, and querying calendar events, powered by a robust and scalable backend architecture.
 
 ## 🚀 Live Demo
 
 Interact with the live agent here:
 
-https://w2usbnhyazjxp7s6a8fzv7.streamlit.app/
+
+singularitylabs.netlify.app/
 
 **Note:** The backend is hosted on a free-tier service, so the first request may take up to 30 seconds to wake the server.
 
