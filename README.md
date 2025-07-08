@@ -12,7 +12,6 @@ This project is a sophisticated, conversational AI agent designed to assist user
 
 Interact with the live agent here:
 
-
 singularitylabs.netlify.app/
 
 **Note:** The backend is hosted on a free-tier service, so the first request may take up to 30 seconds to wake the server.
@@ -40,7 +39,7 @@ This agent is more than a simple bot; it's a fully-featured scheduling assistant
 | Agent Framework         | LangGraph      | To create a stateful, cyclic, and reliable AI agent with complex logic.     |
 | LLM Orchestration       | LangChain      | For integrating with LLMs and managing agent tools.                         |
 | Database                | MongoDB        | A flexible NoSQL database for storing user and event data.                  |
-| Frontend                | Streamlit      | To create a simple and effective real-time chat interface.                  |
+| Frontend                | React (TypeScript) | To create a modern and interactive real-time chat interface.            |
 | Containerization        | Docker         | For packaging the backend application for consistent deployment.            |
 
 ## 🏗️ Architectural Deep Dive
@@ -62,11 +61,10 @@ The codebase is organized into distinct modules, each with a specific responsibi
 
 This structure ensures that the API layer, business logic, and agent reasoning are all decoupled, making the system easier to test, debug, and extend.
 
-
 ### Key Technical Decisions
 
 - **Concurrency Handling:** A significant focus was placed on building a system that could handle real-world scheduling conflicts. The `confirm_and_book_event` and `update_event` tools use a robust check-then-write pattern with configurable buffer logic to ensure data integrity and prevent double-bookings.
-- **Agent Persona & Prompt Engineering:** The agent's personality is carefully crafted through a detailed system prompt to be professional, futuristic, and helpful, reflecting the Helion Energy brand. The prompt also contains explicit instructions for complex workflows, such as recovering from booking failures and handling users with unknown timezones.
+- **Agent Persona & Prompt Engineering:** The agent's personality is carefully crafted through a detailed system prompt to be professional, futuristic, and helpful, reflecting the Singularity Labs brand. The prompt also contains explicit instructions for complex workflows, such as recovering from booking failures and handling users with unknown timezones.
 - **Decoupled Services:** The architecture utilizes a Dependency Injection pattern via the `ServiceProvider`. This centralizes the instantiation of services (like `AuthService`, `UserService`, `CalendarService`) and makes the system highly testable by allowing for easy mocking of dependencies.
 
 ## ⚙️ Running the Project Locally
@@ -125,7 +123,6 @@ You can run the entire application stack locally using Docker and Docker Compose
 
    - **Backend API:** http://localhost:8000
    - **API Docs (Swagger UI):** http://localhost:8000/docs
-   - **Streamlit Frontend:** http://localhost:8501
 
 ## 🔮 Future Work & Potential Enhancements
 
