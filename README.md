@@ -6,7 +6,7 @@
 ![Agent: LangGraph](https://img.shields.io/badge/Agent-LangGraph-orange)
 ![Frontend: React (TypeScript)](https://img.shields.io/badge/Frontend-React%20%28TypeScript%29-red)
 
-This project is a sophisticated, conversational AI agent designed to assist users in booking appointments with the team at Singularity Labs. It provides a seamless, natural language interface for scheduling, managing, and querying calendar events, powered by a robust and scalable backend architecture.
+An AI-powered conversational scheduling assistant for a fictional small team, “Singularity Labs”, enabling natural-language booking and automatic conflict resolution across timezones.
 
 ## 🚀 Live Demo
 
@@ -15,6 +15,24 @@ Interact with the live agent here:
 singularitylabs.netlify.app/
 
 **Note:** The backend is hosted on a free-tier service, so the first request may take up to 30 seconds to wake the server.
+
+## 🖼️ Screenshots
+
+These demonstrate how the backend API powers the booking flow:
+
+**🔒 User Registration**
+![Register](demo/register_page.png)
+
+**⏱️ Intelligent Slot Searching**
+![Slot Searching](demo/slot_searching.png)
+
+**✅ Booking Confirmation**
+![Booked](demo/booked.png)
+
+**📅 Synced Google Calendar**
+![Calendar](demo/calendar.png)
+
+You can view the live shared calendar [here](https://calendar.google.com/calendar/embed?src=7743582e37793f0f1622907a74a0cd7a233930a9496faef57e9642c2dbc78857%40group.calendar.google.com&ctz=Asia%2FKolkata).
 
 ## ✨ Core Features
 
