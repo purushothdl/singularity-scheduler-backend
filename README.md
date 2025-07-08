@@ -34,6 +34,14 @@ These demonstrate how the backend API powers the booking flow:
 
 You can view the live shared calendar [here](https://calendar.google.com/calendar/embed?src=7743582e37793f0f1622907a74a0cd7a233930a9496faef57e9642c2dbc78857%40group.calendar.google.com&ctz=Asia%2FKolkata).
 
+
+## 🧩 LangGraph: The Agent’s Brain
+
+This agent uses a cyclic graph architecture to decide when to invoke tools vs. when to respond directly. Each tool has access to user context, preventing hallucination and ensuring robust, real-world scheduling logic.
+
+![Agent’s Brain Diagram](demo/agents_brain.png)
+
+
 ## ✨ Core Features
 
 This agent is more than a simple bot; it's a fully-featured scheduling assistant with a focus on robustness and user experience.
